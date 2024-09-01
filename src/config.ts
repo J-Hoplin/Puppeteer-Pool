@@ -21,8 +21,8 @@ const config = {
     height: 1024,
   },
   session_pool: {
-    min: 1,
-    max: 5,
+    min: 5,
+    max: 10,
     width: 1080,
     height: 1024,
     ignoreResourceLoad: false,
