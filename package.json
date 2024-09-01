@@ -1,7 +1,7 @@
 {
   "name": "puppeteer-pool",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "repository": "https://github.com/J-Hoplin/Puppeteer-Pool.git",
   "author": "J-Hoplin <jhoplin7259@gmail.com>",
   "license": "MIT",
@@ -13,8 +13,7 @@
     "pidusage": "^3.0.2",
     "pino": "^9.3.2",
     "pino-pretty": "^11.2.2",
-    "puppeteer": "^23.1.1",
-    "reflect-metadata": "^0.2.2"
+    "puppeteer": "^23.1.1"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
