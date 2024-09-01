@@ -27,6 +27,18 @@
 
 - [Puppeteer-Pool-Example](https://github.com/J-Hoplin/Puppeteer-Pool-Example)
 
+## Support
+
+- Pool Managing
+  - Puppeteer Level Pooling
+  - Session Level Pooling
+- Config
+  - Support config customize
+- Threshold Watcher
+  - CPU
+  - Memory
+  - Support safe pool instance reset in runtime
+
 ## Puppeteer Pool Manager Config
 
 Default config should be `puppeteer-pool-config.json` in root directory path.
@@ -91,7 +103,7 @@ If config file are not given or invalid path, manager will use default defined c
   - `break`: Memory Usage break point. If Memory Usage is over this value, it will log and reboot session manager puppeteer.
   - `warn`: Memory Usage warning point. If Memory Usage is over this value, it will log status.
 
-## Puppeteer Pool Manager APIs (`src/pool/manager.ts`)
+## Puppeteer Pool Manager APIs
 
 **This directory will be deploy as single npm package**
 
