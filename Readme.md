@@ -4,6 +4,29 @@
   <img src="./diagram/diagram.png" alt="Image description">
 </p>
 
+## Install packages
+
+- `npm`
+
+  ```
+  npm i @hoplin/puppeteer-pool
+  ```
+
+- `yarn`
+
+  ```
+  yarn add @hoplin/puppeteer-pool
+  ```
+
+- `pnpm`
+  ```
+  pnpm install @hoplin/puppeteer-pool
+  ```
+
+## Example Repository
+
+- [Puppeteer-Pool-Example](https://github.com/J-Hoplin/Puppeteer-Pool-Example)
+
 ## Puppeteer Pool Manager Config
 
 Default config should be `puppeteer-pool-config.json` in root directory path.
