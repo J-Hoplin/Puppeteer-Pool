@@ -3,8 +3,16 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "repository": "https://github.com/J-Hoplin/Puppeteer-Pool.git",
-  "author": "J-Hoplin <jhoplin7259@gmail.com>",
+  "author": "J-Hoplin <hoplin.dev@gmail.com>",
   "license": "MIT",
+  "keywords": [
+    "puppeteer",
+    "puppeteer-pool",
+    "worker",
+    "generic-pool",
+    "node-pool",
+    "hoplin"
+  ],
   "dependencies": {
     "@types/pino": "^7.0.5",
     "@types/pino-pretty": "^5.0.0",
