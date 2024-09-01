@@ -149,19 +149,19 @@ Return single session from pool. You need to pass callback function as parameter
 
 - Return callback's return value
 
-### `getPoolMetrics():Promise<PoolMetrics>`
+### `getPoolMetrics():Promise<PoolMetrics[]>`
 
 Return pool metrics. This includes pool id, pool CPU Usage, Memory Usage
 
 #### Return Value
 
 ```typescript
-{
+[{
   Id: "ID of pool"
   CPU: "Percentage of CPU that Pool is using (System)",
   Memory: "Memory Usage of Memory that Pool is using. Unit is MB (System)",
   SessionPoolCount: "Session count that Pool is managing"
-}
+}]
 
 ```
 
