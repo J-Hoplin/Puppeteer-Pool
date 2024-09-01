@@ -38,6 +38,12 @@
   - CPU
   - Memory
   - Support safe pool instance reset in runtime
+- Metrics
+  - Support Metric by pool
+    - CPU usage of pool
+    - Memory usage of pool
+    - Managing session count in runtime
+- Graceful Shutdown
 
 ## Puppeteer Pool Manager Config
 
