@@ -111,7 +111,6 @@ If config file are not given or invalid path, manager will use default defined c
 
 ## Puppeteer Pool Manager APIs
 
-**This directory will be deploy as single npm package**
 
 ### `bootPoolManager(puppeteerOptions,poolConfigPath):Promise<void>`
 
@@ -127,7 +126,7 @@ Boot pool manager. **You need to invoke this function at least once to use anoth
 
 ### `rebootPoolManager():Promise<void>`
 
-Reboot pool manager. **This api is not recommended to use. Using this API in runtime may occur unintended process break**
+Reboot pool manager. **This api is not recommended to use. Using this API in runtime may occur unintended session control context break**
 
 ### `controlSession(cb):Promise<any>`
 
