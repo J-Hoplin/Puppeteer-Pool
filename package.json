@@ -1,0 +1,42 @@
+{
+  "name": "puppeteer-pool",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/J-Hoplin/Puppeteer-Pool.git",
+  "author": "J-Hoplin <jhoplin7259@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@types/pino": "^7.0.5",
+    "@types/pino-pretty": "^5.0.0",
+    "dayjs": "^1.11.13",
+    "generic-pool": "^3.9.0",
+    "pidusage": "^3.0.2",
+    "pino": "^9.3.2",
+    "pino-pretty": "^11.2.2",
+    "puppeteer": "^23.1.1",
+    "reflect-metadata": "^0.2.2"
+  },
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@types/dotenv": "^8.2.0",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.0",
+    "@types/pidusage": "^2.0.5",
+    "@typescript-eslint/eslint-plugin": "^8.2.0",
+    "@typescript-eslint/parser": "^8.2.0",
+    "eslint": "^9.9.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "husky": "^9.1.5",
+    "prettier": "^3.3.3",
+    "prettier-plugin-sort-imports": "^1.8.6",
+    "tsc-watch": "^6.2.0",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.5.4"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  }
+}

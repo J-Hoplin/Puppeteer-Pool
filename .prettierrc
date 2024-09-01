@@ -1,0 +1,6 @@
+{
+  "plugins": ["prettier-plugin-sort-imports"],
+  "singleQuote": true,
+  "trailingComma": "all",
+  "tabWidth": 2
+}
