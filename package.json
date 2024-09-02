@@ -16,7 +16,6 @@
   "dependencies": {
     "@types/pino": "^7.0.5",
     "@types/pino-pretty": "^5.0.0",
-    "dayjs": "^1.11.13",
     "generic-pool": "^3.9.0",
     "pidusage": "^3.0.2",
     "pino": "^9.3.2",
