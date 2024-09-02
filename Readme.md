@@ -111,7 +111,6 @@ If config file are not given or invalid path, manager will use default defined c
 
 ## Puppeteer Pool Manager APIs
 
-
 ### `bootPoolManager(puppeteerOptions,poolConfigPath):Promise<void>`
 
 Boot pool manager. **You need to invoke this function at least once to use another APIs**
