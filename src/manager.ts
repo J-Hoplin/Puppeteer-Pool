@@ -8,7 +8,6 @@ import genericPool, { Pool } from 'generic-pool';
 import { poolLogger as logger } from './logger';
 import pidusage from 'pidusage';
 import { load } from './config';
-import dayjs from 'dayjs';
 
 /**
  * Global Types
@@ -101,6 +100,18 @@ export async function getPoolMetrics() {
   return await managerInstance.getPoolMetrics();
 }
 
+function logTime() {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
 class PuppeteerPoolManager {
   // Pool Instance
   private pools: Pool<any> = null;
@@ -160,9 +171,8 @@ class PuppeteerPoolManager {
     const targetSignals = ['SIGINT', 'SIGTERM', 'SIGQUIT'];
     targetSignals.forEach((signal) => {
       process.on(signal, () => {
-        const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
         logger.info(
-          `${now} --- Signal received(${signal}) - Terminating puppeteer pool`,
+          `${logTime()} --- Signal received(${signal}) - Terminating puppeteer pool`,
         );
         // Terminate threshold watcher
         clearInterval(this.thresholdWatcher);
