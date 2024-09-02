@@ -1,6 +1,6 @@
 {
   "name": "@hoplin/puppeteer-pool",
-  "version": "1.0.2",
+  "version": "1.0.2-beta",
   "main": "dist/index.js",
   "repository": "https://github.com/J-Hoplin/Puppeteer-Pool.git",
   "author": "J-Hoplin <hoplin.dev@gmail.com>",
