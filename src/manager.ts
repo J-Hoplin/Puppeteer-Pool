@@ -20,9 +20,6 @@ export type MetadataMap = {
   sessionPoolManager: SessionPoolManager;
 };
 
-// Type of session callback
-export type sessionCallback = (page: Page) => Promise<any>;
-
 // Type of session pool metrics
 export type PoolMetricsType = {
   Id: number;
@@ -59,6 +56,8 @@ export async function bootPoolManager(
   await managerInstance.boot(puppeteerOptions);
 }
 
+type sessionCallback<T> = (page: Page) => Promise<T> | T;
+
 /**
  * Reboot pool manager
  *
@@ -81,7 +80,7 @@ export async function rebootPoolManager() {
  *
  * throw exception if pool manager is not initialized
  */
-export async function controlSession(cb: sessionCallback) {
+export async function controlSession<T>(cb:sessionCallback<T>): Promise<T> {
   if (managerInstance === null) {
     throw new PoolManagerNotInitializedException();
   }
@@ -349,7 +348,7 @@ class PuppeteerPoolManager {
    *
    * Acquire resource from browser pool
    */
-  async issueSession(cb: sessionCallback) {
+  async issueSession<T>(cb: sessionCallback<T>):Promise<T> {
     /**
      * Resource type
      * {
