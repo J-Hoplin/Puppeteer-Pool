@@ -80,7 +80,7 @@ export async function rebootPoolManager() {
  *
  * throw exception if pool manager is not initialized
  */
-export async function controlSession<T>(cb:sessionCallback<T>): Promise<T> {
+export async function controlSession<T>(cb: sessionCallback<T>): Promise<T> {
   if (managerInstance === null) {
     throw new PoolManagerNotInitializedException();
   }
@@ -348,7 +348,7 @@ class PuppeteerPoolManager {
    *
    * Acquire resource from browser pool
    */
-  async issueSession<T>(cb: sessionCallback<T>):Promise<T> {
+  async issueSession<T>(cb: sessionCallback<T>): Promise<T> {
     /**
      * Resource type
      * {
