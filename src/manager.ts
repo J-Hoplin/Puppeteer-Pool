@@ -146,10 +146,7 @@ class PuppeteerPoolManager {
            * id: ID of Pool which manage Session Pool
            *
            */
-          const pool = await this.sessionPoolFactory(
-            id,
-            options
-          );
+          const pool = await this.sessionPoolFactory(id, options);
 
           return { pool, id };
         },
@@ -244,7 +241,10 @@ class PuppeteerPoolManager {
     }, config.threshold.interval * 1000);
   }
 
-  async getSessionPoolParts(poolId:number,clearPoolMeatdata:boolean = false){
+  async getSessionPoolParts(
+    poolId: number,
+    clearPoolMeatdata: boolean = false,
+  ) {
     let sessionCounter = 1;
     /**
      *
@@ -258,10 +258,10 @@ class PuppeteerPoolManager {
     });
     const browserProcessId = await capsule.startBrowser();
     // For reboot pool
-    if(clearPoolMeatdata){
-      this.poolMetadata.set(poolId,{
+    if (clearPoolMeatdata) {
+      this.poolMetadata.set(poolId, {
         ...this.poolMetadata.get(poolId),
-        pid:browserProcessId,
+        pid: browserProcessId,
       });
     }
     const sessionPool = genericPool.createPool(
@@ -305,8 +305,8 @@ class PuppeteerPoolManager {
     return {
       capsule,
       browserProcessId,
-      sessionPool
-    }
+      sessionPool,
+    };
   }
 
   /**
@@ -316,12 +316,13 @@ class PuppeteerPoolManager {
     poolId: number,
     puppeteerConfig: PuppeteerLaunchOptions = {},
   ) {
-    const {capsule,browserProcessId,sessionPool} = await this.getSessionPoolParts(poolId);
+    const { capsule, browserProcessId, sessionPool } =
+      await this.getSessionPoolParts(poolId);
     const sessionPoolManager = new SessionPoolManager(
       poolId,
       capsule,
       sessionPool,
-      this
+      this,
     );
     // Enroll PID of puppeteer process when browser is created
     this.poolMetadata.set(poolId, {
@@ -515,7 +516,7 @@ class SessionPoolManager<T = unknown> {
     private poolId: number,
     private browser: PuppeteerCapsule,
     private pool: Pool<T>,
-    private precedenceManager:PuppeteerPoolManager
+    private precedenceManager: PuppeteerPoolManager,
   ) {}
 
   public async acquireSession() {
@@ -523,7 +524,7 @@ class SessionPoolManager<T = unknown> {
     return await this.pool.acquire();
   }
 
-  public async releaseSession(session:T) {
+  public async releaseSession(session: T) {
     logger.info(`Release session from --- Pool ID: ${this.poolId}`);
     return await this.pool.release(session);
   }
@@ -542,7 +543,8 @@ class SessionPoolManager<T = unknown> {
     const previousBrowser = this.browser;
     const previousPool = this.pool;
     // Change to new parts of pool
-    const {capsule,browserProcessId,sessionPool} = await this.precedenceManager.getSessionPoolParts(this.poolId,true);
+    const { capsule, browserProcessId, sessionPool } =
+      await this.precedenceManager.getSessionPoolParts(this.poolId, true);
     this.browser = capsule;
     this.pool = sessionPool as Pool<T>;
 
@@ -550,8 +552,10 @@ class SessionPoolManager<T = unknown> {
     await previousPool.drain();
     await previousPool.clear();
     // Close previous browser
-    await previousBrowser.closeBrowser()
-    logger.info(`Reboot session pool --- PID: ${browserProcessId} --- Pool ID: ${this.poolId}`);
+    await previousBrowser.closeBrowser();
+    logger.info(
+      `Reboot session pool --- PID: ${browserProcessId} --- Pool ID: ${this.poolId}`,
+    );
     return browserProcessId;
   }
 }
