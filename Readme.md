@@ -1,4 +1,5 @@
 # Puppeteer Pool Manager
+![NPM Version](https://img.shields.io/npm/v/%40hoplin%2Fpuppeteer-pool?style=for-the-badge)
 
 <p align="center">
   <img src="./diagram/diagram.png" alt="Image description">
