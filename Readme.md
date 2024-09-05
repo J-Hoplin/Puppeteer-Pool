@@ -58,9 +58,7 @@ If config file are not given or invalid path, manager will use default defined c
 {
   "browser_pool": {
     "min": 2,
-    "max": 5,
-    "width": 1080,
-    "height": 1024
+    "max": 5
   },
   "session_pool": {
     "min": 5,
