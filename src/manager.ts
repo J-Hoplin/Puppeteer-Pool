@@ -112,6 +112,9 @@ function logTime() {
 }
 
 class PuppeteerPoolManager {
+  // Puppeteer launch option
+  private launchOptions: PuppeteerLaunchOptions = {};
+
   // Pool Instance
   private pools: Pool<any> = null;
 
@@ -130,6 +133,7 @@ class PuppeteerPoolManager {
    * Enroll signal handler for graceful shutdown
    */
   async boot(options: PuppeteerLaunchOptions) {
+    this.launchOptions = options;
     this.pools = genericPool.createPool(
       {
         create: async () => {
@@ -142,12 +146,7 @@ class PuppeteerPoolManager {
            * id: ID of Pool which manage Session Pool
            *
            */
-          const pool = await this.sessionPoolFactory(
-            id,
-            options,
-            config.session_pool.ignoreResourceLoad,
-            config.session_pool.enablePageCache,
-          );
+          const pool = await this.sessionPoolFactory(id, options);
 
           return { pool, id };
         },
@@ -213,16 +212,11 @@ class PuppeteerPoolManager {
         // CPU Threshold
         if (CPU >= config.threshold.cpu.break) {
           logger.error(
-            `CPU usage is over threshold. --- Pool ID: ${Id} --- CPU: ${CPU}% (${getOverRate(CPU, config.threshold.cpu.break)}%)`,
+            `CPU usage is over threshold. --- Pool ID: ${Id} --- CPU: ${CPU}% (${getOverRate(CPU, config.threshold.cpu.warn)}%)`,
           );
           logger.error(`Reboot session pool puppeteer --- Pool ID: ${Id}`);
           // Reboot and get pid again
-          const pid =
-            await metadata.sessionPoolManager.rebootSessionPoolPuppeteer();
-          this.poolMetadata.set(Id, {
-            ...metadata,
-            pid,
-          });
+          await metadata.sessionPoolManager.rebootSessionPoolPuppeteer();
           continue;
         } else if (CPU >= config.threshold.cpu.warn) {
           logger.warn(
@@ -232,16 +226,11 @@ class PuppeteerPoolManager {
         // Memory Threshold
         if (Memory >= config.threshold.memory.break) {
           logger.error(
-            `Memory usage is over threshold. Reboot session pool puppeteer --- Pool ID: ${Id} --- Memory: ${Memory}MB (${getOverRate(Memory, config.threshold.memory.break)}%)`,
+            `Memory usage is over threshold. Reboot session pool puppeteer --- Pool ID: ${Id} --- Memory: ${Memory}MB (${getOverRate(Memory, config.threshold.memory.warn)}%)`,
           );
           logger.error(`Reboot session pool puppeteer --- Pool ID: ${Id}`);
           // Reboot and get pid again
-          const pid =
-            await metadata.sessionPoolManager.rebootSessionPoolPuppeteer();
-          this.poolMetadata.set(Id, {
-            ...metadata,
-            pid,
-          });
+          await metadata.sessionPoolManager.rebootSessionPoolPuppeteer();
           continue;
         } else if (Memory >= config.threshold.memory.warn) {
           logger.warn(
@@ -252,14 +241,9 @@ class PuppeteerPoolManager {
     }, config.threshold.interval * 1000);
   }
 
-  /**
-   * Session Pool Facotory
-   */
-  async sessionPoolFactory(
+  async getSessionPoolParts(
     poolId: number,
-    puppeteerConfig: PuppeteerLaunchOptions = {},
-    ignoreResourceLoad = false,
-    enablePageCache = false,
+    clearPoolMeatdata: boolean = false,
   ) {
     let sessionCounter = 1;
     /**
@@ -269,10 +253,17 @@ class PuppeteerPoolManager {
      * Prevent unexpected behavior of raw puppeteer instance via capsulation
      */
     const capsule = new PuppeteerCapsule({
-      ...puppeteerConfig,
+      ...this.launchOptions,
       headless: true,
     });
     const browserProcessId = await capsule.startBrowser();
+    // For reboot pool
+    if (clearPoolMeatdata) {
+      this.poolMetadata.set(poolId, {
+        ...this.poolMetadata.get(poolId),
+        pid: browserProcessId,
+      });
+    }
     const sessionPool = genericPool.createPool(
       {
         create: async () => {
@@ -283,10 +274,10 @@ class PuppeteerPoolManager {
           });
 
           // Speedy Text Scrape option
-          if (ignoreResourceLoad) {
+          if (config.session_pool.ignoreResourceLoad) {
             await ignoreResourceLoading(page);
           }
-          if (enablePageCache) {
+          if (config.session_pool.enablePageCache) {
             await enablePageCaching(page);
           }
 
@@ -310,10 +301,28 @@ class PuppeteerPoolManager {
         min: config.session_pool.min,
       },
     );
+
+    return {
+      capsule,
+      browserProcessId,
+      sessionPool,
+    };
+  }
+
+  /**
+   * Session Pool Facotory
+   */
+  private async sessionPoolFactory(
+    poolId: number,
+    puppeteerConfig: PuppeteerLaunchOptions = {},
+  ) {
+    const { capsule, browserProcessId, sessionPool } =
+      await this.getSessionPoolParts(poolId);
     const sessionPoolManager = new SessionPoolManager(
       poolId,
       capsule,
       sessionPool,
+      this,
     );
     // Enroll PID of puppeteer process when browser is created
     this.poolMetadata.set(poolId, {
@@ -459,7 +468,6 @@ class PuppeteerPoolManager {
  * Why capsulate puppeteer? -> To trace and safe management of puppeteer instance
  *
  */
-
 class PuppeteerCapsule {
   private browser: Browser;
   private pid: number;
@@ -489,6 +497,7 @@ class PuppeteerCapsule {
   async closeBrowser() {
     if (this.browser) {
       await this.browser.close();
+      logger.warn(`Browser Terminated --- PID: ${this.pid}`);
     }
   }
 }
@@ -502,11 +511,12 @@ class PuppeteerCapsule {
  * Act as interface of Session Pool
  *
  */
-class SessionPoolManager<T = any> {
+class SessionPoolManager<T = unknown> {
   constructor(
     private poolId: number,
     private browser: PuppeteerCapsule,
     private pool: Pool<T>,
+    private precedenceManager: PuppeteerPoolManager,
   ) {}
 
   public async acquireSession() {
@@ -530,6 +540,22 @@ class SessionPoolManager<T = any> {
     while (this.pool.borrowed >= 1) {
       await new Promise((resolve) => setTimeout(resolve, 50));
     }
-    return await this.browser.rebootBrowser();
+    const previousBrowser = this.browser;
+    const previousPool = this.pool;
+    // Change to new parts of pool
+    const { capsule, browserProcessId, sessionPool } =
+      await this.precedenceManager.getSessionPoolParts(this.poolId, true);
+    this.browser = capsule;
+    this.pool = sessionPool as Pool<T>;
+
+    // Clear and drain previous pool
+    await previousPool.drain();
+    await previousPool.clear();
+    // Close previous browser
+    await previousBrowser.closeBrowser();
+    logger.info(
+      `Reboot session pool --- PID: ${browserProcessId} --- Pool ID: ${this.poolId}`,
+    );
+    return browserProcessId;
   }
 }

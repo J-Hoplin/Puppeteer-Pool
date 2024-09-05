@@ -2,6 +2,7 @@
   "name": "@hoplin/puppeteer-pool",
   "version": "1.1.0",
   "main": "dist/index.js",
+  "description": "Puppeteer Pool Manager for worker server, process daemon, commands etc...",
   "repository": "https://github.com/J-Hoplin/Puppeteer-Pool.git",
   "author": "J-Hoplin <hoplin.dev@gmail.com>",
   "license": "MIT",
