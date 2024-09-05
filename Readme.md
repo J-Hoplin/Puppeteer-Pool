@@ -221,14 +221,13 @@ import {
   controlSession,
   getPoolMetrics,
 } from '@hoplin/puppeteer-pool';
+import express, { Application } from 'express';
 
 async function bootstrap() {
-  /**
-   * Initialize Express Server
-   */
-
   // Initialize pool
   await bootPoolManager({Puppeteer Launch Options},'Puppeteer Pool Config Path');
+
+  const server: Application = express();
 
   // Control Session example
   server.post('/', async (req, res) => {
@@ -244,13 +243,28 @@ async function bootstrap() {
     return res.status(200).json({ result: controlResponse });
   });
 
+  server.get('/metrics',async(req,res,) => {
+    let puppeteerPoolMetrics = await getPoolMetrics();
+    puppeteerPoolMetrics = puppeteerPoolMetrics.map((metrics) => {
+        const id = `POOL_${metrics.Id}`;
+        const cpu = `${metrics.CPU}%`;
+        const memory =
+          metrics.Memory > 1024
+            ? `${parseFloat((metrics.Memory / 1024).toFixed(2))}GB`
+            : `${metrics.Memory}MB`;
+        const sessionPoolCount = metrics.SessionPoolCount;
+        return { id, cpu, memory, sessionPoolCount };
+      })
+    return res.status(200).json({ result: puppeteerPoolMetrics })
+  })
+
   server.get('/', async (req, res) => {
     const puppeteerPoolMetrics = await getPoolMetrics();
     return res.status(200).json(puppeteerPoolMetrics);
   });
 
-  /**
-   * Some other routers and start server
-   */
+  server.listen(3000, () => {
+    logger.info(`Server listening on port 3000`);
+  });
 }
 ```
