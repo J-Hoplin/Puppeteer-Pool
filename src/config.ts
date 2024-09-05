@@ -47,6 +47,11 @@ function ValidateInteager(
   section: string,
   valueName = 'Value',
 ): void {
+  if (typeof value !== 'number') {
+    throw new ManagerConfigValidationException(
+      `[${section}] Value should be number - ${valueName}: ${value}`,
+    );
+  }
   if (value < 0) {
     throw new ManagerConfigValidationException(
       `[${section}] Negative number not allowed - ${valueName}: ${value}`,
@@ -67,6 +72,11 @@ function ValidateRange(
   minRangeName: string = 'Min',
   maxRangeName: string = 'Max',
 ): void {
+  if(typeof minRange !== 'number' || typeof maxRange !== 'number') {
+    throw new ManagerConfigValidationException(
+      `[${section}] Value should be number - ${minRangeName}: ${minRange}, ${maxRangeName}: ${maxRange}`,
+    );
+  }
   if (minRange < 0 || maxRange < 0) {
     throw new ManagerConfigValidationException(
       `[${section}] Negative number not allowed - ${minRangeName}: ${minRange}, ${maxRangeName}: ${maxRange}`,
@@ -150,7 +160,7 @@ export const load = (configPath: string = null) => {
   if (loadedConfig?.threshold) {
     config.threshold.activate =
       loadedConfig.threshold?.activate ?? config.threshold.activate;
-    ValidateBoolean(config.threshold.activate, 'Threshold Config');
+    ValidateBoolean(config.threshold.activate, 'Threshold Watcher Active Config');
     // Threshold Interval
     config.threshold.interval =
       loadedConfig.threshold?.interval ?? config.threshold.interval;
