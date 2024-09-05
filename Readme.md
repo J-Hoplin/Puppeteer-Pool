@@ -1,4 +1,5 @@
 # Puppeteer Pool Manager
+
 ![NPM Version](https://img.shields.io/npm/v/%40hoplin%2Fpuppeteer-pool?style=for-the-badge)
 
 <p align="center">
@@ -24,9 +25,13 @@
   pnpm install @hoplin/puppeteer-pool
   ```
 
-## Example Repository
+## Go to
 
-- [Puppeteer-Pool-Example](https://github.com/J-Hoplin/Puppeteer-Pool-Example)
+[1. 🔧Pool Manager Config Docuemnt](#puppeteer-pool-manager-config)
+
+[2. 📖Pool Manager APIs Document](#puppeteer-pool-manager-apis)
+
+[3. 😎Pool Manager Usage with Express.js Framework](#usage-example)
 
 ## Support
 
@@ -58,9 +63,7 @@ If config file are not given or invalid path, manager will use default defined c
 {
   "browser_pool": {
     "min": 2,
-    "max": 5,
-    "width": 1080,
-    "height": 1024
+    "max": 5
   },
   "session_pool": {
     "min": 5,
@@ -89,26 +92,62 @@ If config file are not given or invalid path, manager will use default defined c
 
 - `min`: Minimum pool instance
 - `max`: Maximum pool instance
-- `width`: Browser width. Also set browser width and height if you need some acts like capturing screen or else.
-- `height`: Browser height. Also set browser width and height if you need some acts like capturing screen or else.
+  - **Range Validation**
+    - `max` should be larger or equal than `min`
+    - `min` should be larger or equal than 1
+    - Both `min` and `max` should be integer
 
 ### `session_pool`
 
 - `min`: Minimum pool instance
 - `max`: Maximum pool instance
+  - **Range Validation**
+    - `max` should be larger or equal than `min`
+    - `min` should be larger or equal than 1
+    - Both `min` and `max` should be integer
+    - Both `min` and `max` does not allow negative number
+
+---
+
+- `width`: Browser width. Also set browser width and height if you need some acts like capturing screen or else.
+  - **Inteager Validation**
+    - `width` should be integer
+    - `width` should be at least 50
+    - `width` does not allow negative number
+- `height`: Browser height. Also set browser width and height if you need some acts like capturing screen or else.
+  - **Inteager Validation**
+    - `height` should be integer
+    - `height` should be at least 50
+    - `height` does not allow negative number
 - `ignoreResourceLoad`: Ignore resource load(This option makes ignore `image`, `stylesheet`, `font` assets request). If you set true, it will ignore resource load. This will increase performance but may occur some unintended behavior.
+  - **Boolean Validation**
+    - `ignoreResourceLoad` should be boolean
 - `enablePageCache`: Enable page cache. If you set true, it will cache page. This will increase performance but may occur some unintended behavior.
+  - **Boolean Validation**
+    - `enablePageCache` should be boolean
 
 ### `threshold`
 
 - `activate`: Activate threshold or not
+  - **Boolean Validation**
+    - `activate` should be boolean
 - `interval`: Interval of checking threshold
 - `cpu`
   - `break`: CPU Usage break point. If CPU Usage is over this value, it will log status and reboot session manager puppeteer.
   - `warn`: CPU Usage warning point. If CPU Usage is over this value, it will log status.
+    - **Range Validation**
+      - `break` should be larger or equal than `warn`
+      - `warn` should be larger or equal than 1
+      - Both `break` and `warn` should be integer
+      - Both `break` and `warn` does not allow negative number
 - `memory`
   - `break`: Memory Usage break point. If Memory Usage is over this value, it will log and reboot session manager puppeteer.
   - `warn`: Memory Usage warning point. If Memory Usage is over this value, it will log status.
+    - **Range Validation**
+      - `break` should be larger or equal than `warn`
+      - `warn` should be larger or equal than 100
+      - Both `break` and `warn` should be integer
+      - Both `break` and `warn` does not allow negative number
 
 ## Puppeteer Pool Manager APIs
 
@@ -119,7 +158,7 @@ Boot pool manager. **You need to invoke this function at least once to use anoth
 #### Parameter
 
 - `puppeteerOptions`
-  - `PuppeteerLaunchOptions` from puppeteer([Ref](https://pptr.dev/api/puppeteer.launchoptions))
+  - `PuppeteerLaunchOptions` from puppeteer([Ref](https://pptr.dev/api/puppeteer.puppeteerlaunchoptions))
 - `poolConfigPath`
   - `string`
   - Custom Puppeteer Pool config path. Default is project root's `puppeteer-pool-config.json`
@@ -130,7 +169,12 @@ Reboot pool manager. **This api is not recommended to use. Using this API in run
 
 ### `controlSession(cb):Promise<any>`
 
-Return single session from pool. You need to pass callback function as parameter to use in session. This return result of callback function return value
+Return single session from pool. You need to pass callback function as parameter to use in session.
+
+#### About Callback Function
+
+Manager will pass `session`, which is [`Page`](https://pptr.dev/api/puppeteer.page) type of puppeteer to callback function.
+This API will return result of callback function.
 
 #### Parameter
 
@@ -142,7 +186,7 @@ Return single session from pool. You need to pass callback function as parameter
     // Session Callback type
     import { Page } from 'puppeteer';
 
-    type sessionCallback = (page: Page) => Promise<any>;
+    type sessionCallback<T> = (page: Page) => Promise<T>;
     ```
 
 #### Return Value
@@ -157,12 +201,12 @@ Return pool metrics. This includes pool id, pool CPU Usage, Memory Usage
 
 ```typescript
 [
-{
-  Id: "ID of pool"
-  CPU: "Percentage of CPU that Pool is using (System)",
-  Memory: "Memory Usage of Memory that Pool is using. Unit is MB (System)",
-  SessionPoolCount: "Session count that Pool is managing"
-}
+  {
+    Id: "ID of pool"
+    CPU: "Percentage of CPU that Pool is using (System)",
+    Memory: "Memory Usage of Memory that Pool is using. Unit is MB (System)",
+    SessionPoolCount: "Session count that Pool is managing"
+  }
 ]
 
 ```
