@@ -18,11 +18,10 @@ export class SessionCallbackException extends Error {
   }
 }
 
-
 /**
  * Exception for manager config validation
  */
-export class ManagerConfigValidationException extends Error{
+export class ManagerConfigValidationException extends Error {
   constructor(message: string) {
     super(`Validation error: ${message}`);
     this.name = 'MangerConfigValidationException';
