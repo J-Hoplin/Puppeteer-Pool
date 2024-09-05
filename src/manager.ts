@@ -28,6 +28,12 @@ export type PoolMetricsType = {
   SessionPoolCount: number;
 };
 
+enum SessionPoolManagerState {
+  LIVE = 'LIVE',
+  PENDING = 'PENDING',
+  DOWN = 'DOWN',
+}
+
 /**
  * Global Instances
  */
@@ -512,6 +518,9 @@ class PuppeteerCapsule {
  *
  */
 class SessionPoolManager<T = unknown> {
+  // State of session pool manager
+  private state: SessionPoolManagerState = SessionPoolManagerState.LIVE;
+
   constructor(
     private poolId: number,
     private browser: PuppeteerCapsule,
@@ -529,13 +538,26 @@ class SessionPoolManager<T = unknown> {
     return await this.pool.release(session);
   }
 
-  async close() {
+  // Do not use JS getter, setter
+  public getState() {
+    return this.state;
+  }
+
+  private setState(state: SessionPoolManagerState) {
+    this.state = state;
+  }
+
+  public async close() {
     await this.pool.drain();
     await this.pool.clear();
     await this.browser.closeBrowser();
   }
 
   async rebootSessionPoolPuppeteer() {
+    if (this.state !== SessionPoolManagerState.LIVE) {
+      return;
+    }
+    this.setState(SessionPoolManagerState.PENDING);
     // Wait until all session is released
     while (this.pool.borrowed >= 1) {
       await new Promise((resolve) => setTimeout(resolve, 50));
@@ -556,6 +578,7 @@ class SessionPoolManager<T = unknown> {
     logger.info(
       `Reboot session pool --- PID: ${browserProcessId} --- Pool ID: ${this.poolId}`,
     );
+    this.setState(SessionPoolManagerState.LIVE);
     return browserProcessId;
   }
 }
