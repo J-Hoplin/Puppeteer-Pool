@@ -72,7 +72,7 @@ function ValidateRange(
   minRangeName: string = 'Min',
   maxRangeName: string = 'Max',
 ): void {
-  if(typeof minRange !== 'number' || typeof maxRange !== 'number') {
+  if (typeof minRange !== 'number' || typeof maxRange !== 'number') {
     throw new ManagerConfigValidationException(
       `[${section}] Value should be number - ${minRangeName}: ${minRange}, ${maxRangeName}: ${maxRange}`,
     );
@@ -160,7 +160,10 @@ export const load = (configPath: string = null) => {
   if (loadedConfig?.threshold) {
     config.threshold.activate =
       loadedConfig.threshold?.activate ?? config.threshold.activate;
-    ValidateBoolean(config.threshold.activate, 'Threshold Watcher Active Config');
+    ValidateBoolean(
+      config.threshold.activate,
+      'Threshold Watcher Active Config',
+    );
     // Threshold Interval
     config.threshold.interval =
       loadedConfig.threshold?.interval ?? config.threshold.interval;

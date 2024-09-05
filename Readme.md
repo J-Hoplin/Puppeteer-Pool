@@ -106,7 +106,9 @@ If config file are not given or invalid path, manager will use default defined c
     - `min` should be larger or equal than 1
     - Both `min` and `max` should be integer
     - Both `min` and `max` does not allow negative number
-***
+
+---
+
 - `width`: Browser width. Also set browser width and height if you need some acts like capturing screen or else.
   - **Inteager Validation**
     - `width` should be integer
@@ -167,10 +169,11 @@ Reboot pool manager. **This api is not recommended to use. Using this API in run
 
 ### `controlSession(cb):Promise<any>`
 
-Return single session from pool. You need to pass callback function as parameter to use in session. 
+Return single session from pool. You need to pass callback function as parameter to use in session.
 
 #### About Callback Function
-Manager will pass `session`, which is [`Page`](https://pptr.dev/api/puppeteer.page) type of puppeteer to callback function. 
+
+Manager will pass `session`, which is [`Page`](https://pptr.dev/api/puppeteer.page) type of puppeteer to callback function.
 This API will return result of callback function.
 
 #### Parameter
