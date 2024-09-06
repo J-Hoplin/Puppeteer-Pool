@@ -107,7 +107,6 @@ If config file are not given or invalid path, manager will use default defined c
     - Both `min` and `max` should be integer
     - Both `min` and `max` does not allow negative number
 
----
 
 - `width`: Browser width. Also set browser width and height if you need some acts like capturing screen or else.
   - **Inteager Validation**
