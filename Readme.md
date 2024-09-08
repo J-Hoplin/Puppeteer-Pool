@@ -6,6 +6,38 @@
   <img src="./diagram/diagram.png" alt="Image description">
 </p>
 
+## Issue Handling in server runtime
+
+Some servers may have trouble with puppeteer. Follow this step to resolve related issues.
+
+1. Install system dependencies. Puppeteer requires several dependencies to execute.
+
+```
+sudo apt-get install -y libnss3 libatk1.0-0 libx11-xcb1 libxcomposite1 libasound2 libgtk-3-0
+```
+
+2. Install Chronium Browser
+
+```
+sudp apt-get install chromium-browser
+
+which chronium-browser
+```
+
+3. Attach executable path
+
+```typescript
+  await bootPoolManager({
+    args: [
+        '--no-sandbox',
+        '--disable-gpu',
+        '--disable-setuid-sandbox'
+      ],
+    executablePath: '(Result of 'which chronium-browser')',
+  });
+```
+
+
 ## Install packages
 
 - `npm`
