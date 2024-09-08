@@ -6,7 +6,7 @@
   <img src="./diagram/diagram.png" alt="Image description">
 </p>
 
-## Issue Handling in server runtime
+## Bootstrap issue handling in server runtime
 
 Some servers may have trouble with puppeteer. Follow this step to resolve related issues.
 
