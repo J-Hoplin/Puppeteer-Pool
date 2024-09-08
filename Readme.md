@@ -8,7 +8,7 @@
 
 ## Bootstrap issue handling in server runtime
 
-Some servers may have trouble with puppeteer. Follow this step to resolve related issues.
+Some servers may have trouble with puppeteer, Like session pool is not initializing or other similar cases. Follow these steps to resolve related issues.
 
 1. Install system dependencies. Puppeteer requires several dependencies to execute.
 
