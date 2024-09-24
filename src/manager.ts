@@ -59,7 +59,10 @@ export async function bootPoolManager(
   }
   logger.info('Boot pool manager');
   managerInstance = new PuppeteerPoolManager();
-  await managerInstance.boot(puppeteerOptions);
+  await managerInstance.boot({
+    ...puppeteerOptions,
+    executablePath: puppeteer.executablePath(),
+  });
 }
 
 type sessionCallback<T> = (page: Page) => Promise<T> | T;
