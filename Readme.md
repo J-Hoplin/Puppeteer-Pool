@@ -37,7 +37,6 @@ which chronium-browser
   });
 ```
 
-
 ## Install packages
 
 - `npm`
@@ -133,12 +132,12 @@ If config file are not given or invalid path, manager will use default defined c
 
 - `min`: Minimum pool instance
 - `max`: Maximum pool instance
+
   - **Range Validation**
     - `max` should be larger or equal than `min`
     - `min` should be larger or equal than 1
     - Both `min` and `max` should be integer
     - Both `min` and `max` does not allow negative number
-
 
 - `width`: Browser width. Also set browser width and height if you need some acts like capturing screen or else.
   - **Inteager Validation**
