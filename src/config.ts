@@ -31,12 +31,12 @@ const config = {
     activate: true,
     interval: 5,
     cpu: {
-      break: 10,
-      warn: 5,
+      break: 80,
+      warn: 45,
     },
     memory: {
-      break: 300,
-      warn: 200,
+      break: 2048,
+      warn: 800,
     },
   },
 };

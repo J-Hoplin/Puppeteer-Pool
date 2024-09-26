@@ -2,11 +2,35 @@
 
 ![NPM Version](https://img.shields.io/npm/v/%40hoplin%2Fpuppeteer-pool?style=for-the-badge)
 
+> ### Urgent Request! Please update to 1.1.4 version ASAP
+>
+> There was an critical error in Threshold Watcher Layer that the Process Tree was not recursively inspected. **From version 1.1.4, the issue has been resolved. If you see this Readme, please update the package as soon as possible**
+
 <p align="center">
   <img src="./diagram/diagram.png" alt="Image description">
 </p>
 
-## Bootstrap issue handling in server runtime
+## Are you facing issue?
+
+If there's no other related issue that you are facing in this list, please add issue. Then I'll discuss with you as fast as I can
+
+<details>
+<summary><b>Is there any default Puppeteer launch options that manager is using?</b></summary>
+<div markdown="1">
+
+Yes. there are two default setting that maanger will use. If you want to change these default settings, please override these options.
+
+```javascript
+executablePath: puppeteer.executablePath(),
+headless: true,
+```
+
+</div>
+</details>
+
+<details>
+<summary><b>Bootstrap issue handling in server runtime</b></summary>
+<div markdown="1">
 
 Some servers may have trouble with puppeteer, Like session pool is not initializing or other similar cases. Follow these steps to resolve related issues.
 
@@ -33,7 +57,12 @@ await bootPoolManager({
 });
 ```
 
-## Issue in ubuntu server, not boot strapped
+</div>
+</details>
+
+<details>
+<summary><b>Issue in ubuntu server, not boot strapped</b></summary>
+<div markdown="1">
 
 You need to install dependencies to start chromium
 
@@ -79,6 +108,9 @@ sudo apt-get install -y \
     wget \
     libgbm-dev
 ```
+
+</div>
+</details>
 
 ## Install packages
 
@@ -151,12 +183,12 @@ If config file are not given or invalid path, manager will use default defined c
     "activate": true,
     "interval": 5,
     "cpu": {
-      "break": 10,
-      "warn": 5
+      "break": 80,
+      "warn": 45,
     },
     "memory": {
-      "break": 300,
-      "warn": 200
+      "break": 2048,
+      "warn": 800,
     }
   }
 }
@@ -269,6 +301,8 @@ This API will return result of callback function.
 ### `getPoolMetrics():Promise<Array<PoolMetrics>>`
 
 Return pool metrics. This includes pool id, pool CPU Usage, Memory Usage
+
+**Both CPU, Memory values returned are the recursive detection of the process tree in each single pool.**
 
 #### Return Value
 

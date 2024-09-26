@@ -8,3 +8,4 @@ puppeteer-pool-config.json
 tsconfig.json
 .prettierrc
 eslintrc.js
+test.js
