@@ -4,7 +4,7 @@
 
 > ### Urgent Request! Please update to 1.1.4 version ASAP
 >
-> There was an critical error in Threshold Watcher Layer that the Process Tree was not recursively inspected. **From version 1.1.4, the issue has been resolved. If you see this Readme, please update the package as soon as possible**
+> There was an critical error in Threshold Watcher Layer that the Process Tree was not recursively inspected. **From version 1.1.4, the issue has been resolved. If you see this Readme, please update the package as soon as possible. Also if you're using custom `puppeteer-pool-config.json` after update package upperthan 1.1.4 version, please re configure your custom config file.**
 
 <p align="center">
   <img src="./diagram/diagram.png" alt="Image description">
