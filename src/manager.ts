@@ -6,6 +6,7 @@ import puppeteer, { Browser, Page, PuppeteerLaunchOptions } from 'puppeteer';
 import { enablePageCaching, ignoreResourceLoading } from './options';
 import genericPool, { Pool } from 'generic-pool';
 import { poolLogger as logger } from './logger';
+import { execSync } from 'child_process';
 import pidusage from 'pidusage';
 import { load } from './config';
 
@@ -60,8 +61,9 @@ export async function bootPoolManager(
   logger.info('Boot pool manager');
   managerInstance = new PuppeteerPoolManager();
   await managerInstance.boot({
-    ...puppeteerOptions,
     executablePath: puppeteer.executablePath(),
+    headless: true,
+    ...puppeteerOptions,
   });
 }
 
@@ -221,7 +223,7 @@ class PuppeteerPoolManager {
         // CPU Threshold
         if (CPU >= config.threshold.cpu.break) {
           logger.error(
-            `CPU usage is over threshold. --- Pool ID: ${Id} --- CPU: ${CPU}% (${getOverRate(CPU, config.threshold.cpu.warn)}%)`,
+            `CPU usage is over threshold. --- Pool ID: ${Id} --- CPU: ${CPU}% (${getOverRate(CPU, config.threshold.cpu.break)}%)`,
           );
           logger.error(`Reboot session pool puppeteer --- Pool ID: ${Id}`);
           // Reboot and get pid again
@@ -229,13 +231,13 @@ class PuppeteerPoolManager {
           continue;
         } else if (CPU >= config.threshold.cpu.warn) {
           logger.warn(
-            `[Warn] CPU usage is over threshold --- Pool ID: ${Id} --- CPU: ${CPU}% (${getOverRate(CPU, config.threshold.cpu.warn)}%)`,
+            `[Warn] CPU usage is over threshold --- Pool ID: ${Id} --- CPU: ${CPU}% (${getOverRate(CPU, config.threshold.cpu.break)}%)`,
           );
         }
         // Memory Threshold
         if (Memory >= config.threshold.memory.break) {
           logger.error(
-            `Memory usage is over threshold. Reboot session pool puppeteer --- Pool ID: ${Id} --- Memory: ${Memory}MB (${getOverRate(Memory, config.threshold.memory.warn)}%)`,
+            `Memory usage is over threshold. Reboot session pool puppeteer --- Pool ID: ${Id} --- Memory: ${Memory}MB (${getOverRate(Memory, config.threshold.memory.break)}%)`,
           );
           logger.error(`Reboot session pool puppeteer --- Pool ID: ${Id}`);
           // Reboot and get pid again
@@ -243,7 +245,7 @@ class PuppeteerPoolManager {
           continue;
         } else if (Memory >= config.threshold.memory.warn) {
           logger.warn(
-            `[Warn] Memory usage is over threshold --- Pool ID: ${Id} --- Memory: ${Memory}MB (${getOverRate(Memory, config.threshold.memory.warn)}%)`,
+            `[Warn] Memory usage is over threshold --- Pool ID: ${Id} --- Memory: ${Memory}MB (${getOverRate(Memory, config.threshold.memory.break)}%)`,
           );
         }
       }
@@ -263,7 +265,6 @@ class PuppeteerPoolManager {
      */
     const capsule = new PuppeteerCapsule({
       ...this.launchOptions,
-      headless: true,
     });
     const browserProcessId = await capsule.startBrowser();
     // For reboot pool
@@ -428,6 +429,30 @@ class PuppeteerPoolManager {
         memory: parseFloat(MemoryUsage),
       };
     };
+    const getChildProcessLists = (pid: number) => {
+      const childProcessRetriever = (pid: number) => {
+        const command =
+          process.platform === 'win32'
+            ? `wmic process where (ParentProcessId=${pid}) get ProcessId`
+            : `pgrep -P ${pid}`;
+        try {
+          const commandResult = execSync(command, { encoding: 'utf-8' });
+          const pids = commandResult
+            .trim()
+            .split(/\s+/)
+            .filter(Number)
+            .map((pid) => parseInt(pid));
+          pids.reduce((acc, cur) => {
+            return [...acc, childProcessRetriever(cur)];
+          }, []);
+          return [...pids];
+        } catch (err) {
+          // Expect as process tree leaf node
+          return [];
+        }
+      };
+      return childProcessRetriever(pid);
+    };
 
     if (id) {
       const metadata = this.poolMetadata.get(id);
@@ -436,21 +461,47 @@ class PuppeteerPoolManager {
       }
       const { pid, sessionPoolCount } = metadata;
       const stats = await pidusage(pid);
-      const { cpu, memory } = getStatCpuMemoryUsage(stats);
+      const { cpu: parentProcessCPU, memory: parentProcessMemory } =
+        getStatCpuMemoryUsage(stats);
+      const childProcessPids = getChildProcessLists(pid);
+      const childProcessMetrics: { cpu: number; memory: number }[] = [];
+      for (const childPid of childProcessPids) {
+        const childStats = await pidusage(childPid);
+        childProcessMetrics.push(getStatCpuMemoryUsage(childStats));
+      }
+      let totalPoolCPUUsage = parentProcessCPU;
+      let totalPoolMemoryUsage = parentProcessMemory;
+      childProcessMetrics.forEach((process) => {
+        (totalPoolCPUUsage += process.cpu),
+          (totalPoolMemoryUsage += process.memory);
+      });
       response.push({
         Id: id,
-        CPU: cpu,
-        Memory: memory,
+        CPU: parseFloat(totalPoolCPUUsage.toFixed(2)),
+        Memory: parseFloat(totalPoolMemoryUsage.toFixed(2)),
         SessionPoolCount: sessionPoolCount,
       });
     } else {
       for (const [poolId, { pid, sessionPoolCount }] of this.poolMetadata) {
         const stats = await pidusage(pid);
-        const { cpu, memory } = getStatCpuMemoryUsage(stats);
+        const { cpu: parentProcessCPU, memory: parentProcessMemory } =
+          getStatCpuMemoryUsage(stats);
+        const childProcessPids = getChildProcessLists(pid);
+        const childProcessMetrics: { cpu: number; memory: number }[] = [];
+        for (const childPid of childProcessPids) {
+          const childStats = await pidusage(childPid);
+          childProcessMetrics.push(getStatCpuMemoryUsage(childStats));
+        }
+        let totalPoolCPUUsage = parentProcessCPU;
+        let totalPoolMemoryUsage = parentProcessMemory;
+        childProcessMetrics.forEach((process) => {
+          (totalPoolCPUUsage += process.cpu),
+            (totalPoolMemoryUsage += process.memory);
+        });
         response.push({
           Id: poolId,
-          CPU: cpu,
-          Memory: memory,
+          CPU: parseFloat(totalPoolCPUUsage.toFixed(2)),
+          Memory: parseFloat(totalPoolMemoryUsage.toFixed(2)),
           SessionPoolCount: sessionPoolCount,
         });
       }
