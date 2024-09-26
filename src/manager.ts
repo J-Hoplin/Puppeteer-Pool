@@ -223,29 +223,33 @@ class PuppeteerPoolManager {
         // CPU Threshold
         if (CPU >= config.threshold.cpu.break) {
           logger.error(
-            `CPU usage is over threshold. --- Pool ID: ${Id} --- CPU: ${CPU}% (${getOverRate(CPU, config.threshold.cpu.break)}%)`,
+            `[Thresold Watcher] CPU usage is over threshold. --- Pool ID: ${Id} --- CPU: ${CPU}% (${getOverRate(CPU, config.threshold.cpu.break)}%)`,
           );
-          logger.error(`Reboot session pool puppeteer --- Pool ID: ${Id}`);
+          logger.error(
+            `[Thresold Watcher] Reboot session pool puppeteer --- Pool ID: ${Id}`,
+          );
           // Reboot and get pid again
           await metadata.sessionPoolManager.rebootSessionPoolPuppeteer();
           continue;
         } else if (CPU >= config.threshold.cpu.warn) {
           logger.warn(
-            `[Warn] CPU usage is over threshold --- Pool ID: ${Id} --- CPU: ${CPU}% (${getOverRate(CPU, config.threshold.cpu.break)}%)`,
+            `[Thresold Watcher] CPU usage is over threshold --- Pool ID: ${Id} --- CPU: ${CPU}% (${getOverRate(CPU, config.threshold.cpu.break)}%)`,
           );
         }
         // Memory Threshold
         if (Memory >= config.threshold.memory.break) {
           logger.error(
-            `Memory usage is over threshold. Reboot session pool puppeteer --- Pool ID: ${Id} --- Memory: ${Memory}MB (${getOverRate(Memory, config.threshold.memory.break)}%)`,
+            `[Thresold Watcher] Memory usage is over threshold. Reboot session pool puppeteer --- Pool ID: ${Id} --- Memory: ${Memory}MB (${getOverRate(Memory, config.threshold.memory.break)}%)`,
           );
-          logger.error(`Reboot session pool puppeteer --- Pool ID: ${Id}`);
+          logger.error(
+            `[Thresold Watcher] Reboot session pool puppeteer --- Pool ID: ${Id}`,
+          );
           // Reboot and get pid again
           await metadata.sessionPoolManager.rebootSessionPoolPuppeteer();
           continue;
         } else if (Memory >= config.threshold.memory.warn) {
           logger.warn(
-            `[Warn] Memory usage is over threshold --- Pool ID: ${Id} --- Memory: ${Memory}MB (${getOverRate(Memory, config.threshold.memory.break)}%)`,
+            `[Thresold Watcher] Memory usage is over threshold --- Pool ID: ${Id} --- Memory: ${Memory}MB (${getOverRate(Memory, config.threshold.memory.break)}%)`,
           );
         }
       }

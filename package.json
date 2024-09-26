@@ -1,6 +1,6 @@
 {
   "name": "@hoplin/puppeteer-pool",
-  "version": "1.1.4-alpha",
+  "version": "1.1.4-beta",
   "main": "dist/index.js",
   "description": "Puppeteer Pool Manager for worker server, process daemon, commands etc...",
   "repository": "https://github.com/J-Hoplin/Puppeteer-Pool.git",
@@ -14,15 +14,7 @@
     "node-pool",
     "hoplin"
   ],
-  "dependencies": {
-    "@types/pino": "^7.0.5",
-    "@types/pino-pretty": "^5.0.0",
-    "generic-pool": "^3.9.0",
-    "pidusage": "^3.0.2",
-    "pino": "^9.3.2",
-    "pino-pretty": "^11.2.2",
-    "puppeteer": "^23.1.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/dotenv": "^8.2.0",
@@ -39,7 +31,14 @@
     "prettier-plugin-sort-imports": "^1.8.6",
     "tsc-watch": "^6.2.0",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "@types/pino": "^7.0.5",
+    "@types/pino-pretty": "^5.0.0",
+    "generic-pool": "^3.9.0",
+    "pidusage": "^3.0.2",
+    "pino": "^9.3.2",
+    "pino-pretty": "^11.2.2",
+    "puppeteer": "^23.1.1"
   },
   "scripts": {
     "prepare": "husky",
